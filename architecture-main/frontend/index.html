@@ -1,0 +1,2569 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת דיווח נזקים</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #1A5276;
+            --bg-light: #FAFAFA;
+            --bg-white: #FFFFFF;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-gray: #E0E0E0;
+            --border-light: #F0F0F0;
+            --success-green: #2E7D32;
+            --error-red: #C62828;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+        
+        body {
+            font-family: 'Heebo', 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* ===================== Login Overlay ===================== */
+        #login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 82, 118, 0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9000;
+        }
+
+        .login-box {
+            background: var(--bg-white);
+            border-radius: 6px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+        }
+
+        .login-box h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .login-box .login-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+        }
+
+        .login-box .form-group {
+            margin-bottom: 18px;
+        }
+
+        #login-error {
+            display: none;
+            font-size: 13px;
+            color: var(--error-red);
+            background: #FFEBEE;
+            border: 1px solid var(--error-red);
+            border-radius: 4px;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+        }
+
+        .login-hint {
+            margin-top: 18px;
+            padding: 12px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .login-hint strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* ===================== User bar in header ===================== */
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-user-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-user-name span {
+            color: var(--primary-color);
+        }
+
+        .logout-btn {
+            padding: 7px 16px;
+            font-size: 13px;
+            background: transparent;
+            border: 1px solid var(--border-gray);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .logout-btn:hover {
+            border-color: var(--error-red);
+            color: var(--error-red);
+        }
+
+        /* ===================== Action History ===================== */
+        .action-history-section {
+            grid-column: 1 / -1;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-gray);
+        }
+
+        .action-history-section .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .action-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .action-history-table thead {
+            background: var(--bg-light);
+        }
+
+        .action-history-table th {
+            padding: 10px 14px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .action-history-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-primary);
+            vertical-align: top;
+        }
+
+        .action-history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .action-history-empty {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-style: italic;
+        }
+
+        /* ===================== Original header ===================== */
+        .page-header {
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-gray);
+            padding: 28px 0;
+            margin-bottom: 32px;
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+        
+        .header-content h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .header-content p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border-gray);
+            background-color: var(--bg-white);
+            margin-bottom: 32px;
+            padding: 0 28px;
+        }
+        
+        .nav-tabs button {
+            padding: 16px 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            position: relative;
+            transition: color 0.2s ease;
+            white-space: nowrap;
+            font-family: inherit;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+        
+        .nav-tabs button:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-tabs button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .message {
+            padding: 14px 16px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-right: 4px solid;
+            background-color: var(--bg-white);
+        }
+        
+        .message.success {
+            background-color: #E8F5E9;
+            color: var(--success-green);
+            border-right-color: var(--success-green);
+            display: block;
+        }
+        
+        .message.error {
+            background-color: #FFEBEE;
+            color: var(--error-red);
+            border-right-color: var(--error-red);
+            display: block;
+        }
+        
+        .form-container {
+            background: var(--bg-white);
+            padding: 32px;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            max-width: 500px;
+        }
+        
+        .form-container h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .form-container > p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--bg-white);
+            color: var(--text-primary);
+            transition: border-color 0.2s ease, outline 0.2s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: -1px;
+            border-color: var(--primary-color);
+        }
+        
+        input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        button {
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            border-radius: 4px;
+            padding: 10px 24px;
+        }
+        
+        button:not(.secondary):not(.status-option) {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        button:not(.secondary):not(.status-option):hover {
+            background-color: #0D2D47;
+        }
+        
+        button:not(.secondary):not(.status-option):active {
+            background-color: #051F33;
+        }
+        
+        button:not(.secondary):not(.status-option):disabled {
+            background-color: #BDBDBD;
+            cursor: not-allowed;
+        }
+        
+        button.secondary {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-gray);
+        }
+        
+        button.secondary:hover {
+            background-color: #F5F5F5;
+        }
+        
+        .reports-table-wrapper {
+            background: var(--bg-white);
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .reports-table thead {
+            background-color: var(--bg-light);
+            border-bottom: 1px solid var(--border-gray);
+        }
+        
+        .reports-table th {
+            padding: 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-right: 1px solid var(--border-gray);
+        }
+        
+        .reports-table th:last-child {
+            border-right: none;
+        }
+        
+        .reports-table tbody tr {
+            border-bottom: 1px solid var(--border-light);
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .reports-table tbody tr:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .reports-table tbody tr:nth-child(even) {
+            background-color: var(--bg-white);
+        }
+        
+        .reports-table tbody tr:nth-child(odd) {
+            background-color: #FAFAFA;
+        }
+        
+        .reports-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-right: 1px solid var(--border-light);
+        }
+        
+        .reports-table td:last-child {
+            border-right: none;
+        }
+        
+        .damage-type-cell {
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border: 1px solid;
+        }
+        
+        .status-badge.new {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background-color: transparent;
+        }
+        
+        .status-badge.in-review {
+            color: #7B7B7B;
+            border-color: #7B7B7B;
+            background-color: transparent;
+        }
+        
+        .status-badge.waiting {
+            color: #F57C00;
+            border-color: #F57C00;
+            background-color: transparent;
+        }
+        
+        .status-badge.in-restoration {
+            color: #1565C0;
+            border-color: #1565C0;
+            background-color: transparent;
+        }
+        
+        .status-badge.restoration-completed {
+            color: var(--success-green);
+            border-color: var(--success-green);
+            background-color: transparent;
+        }
+
+        .status-badge.failed {
+            color: var(--error-red);
+            border-color: var(--error-red);
+            background-color: transparent;
+        }
+
+        .severity-low    { color: #2E7D32; border-color: #2E7D32; }
+        .severity-medium { color: #F57C00; border-color: #F57C00; }
+        .severity-severe { color: var(--error-red); border-color: var(--error-red); }
+
+        .assessment-section {
+            grid-column: 1 / -1;
+            margin-top: 24px;
+            padding: 20px;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            background: var(--bg-light);
+        }
+
+        .assessment-section .detail-label {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--primary-color);
+        }
+
+        .assessment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .locality-summary-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            padding: 20px 24px;
+        }
+
+        .locality-summary-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--primary-color);
+        }
+
+        .locality-summary-stats {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .locality-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--bg-light);
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            padding: 12px 20px;
+            min-width: 100px;
+        }
+
+        .locality-stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .locality-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .locality-stat.eligible   .locality-stat-number { color: var(--success-green); }
+        .locality-stat.ineligible .locality-stat-number { color: var(--error-red); }
+        .locality-stat.pending    .locality-stat-number { color: #F57C00; }
+
+        .notifications-mode-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            padding: 14px 18px;
+            flex-wrap: wrap;
+        }
+
+        .notifications-mode-label {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 6px 14px;
+            font-size: 13px;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        .mode-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.5;
+        }
+        
+        .package-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .package-modal-content {
+            background: var(--bg-white);
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            padding: 28px;
+            max-width: 420px;
+            width: 100%;
+        }
+        
+        .package-modal-content h3 {
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+        
+        .package-modal-content p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .package-modal-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .search-bar {
+            margin-bottom: 24px;
+        }
+        
+        .search-bar-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-input-wrapper input {
+            padding-right: 40px;
+            width: 100%;
+        }
+        
+        .city-filter-wrapper {
+            min-width: 180px;
+        }
+        
+        .batch-generate-btn {
+            white-space: nowrap;
+            padding: 10px 20px;
+            flex-shrink: 0;
+        }
+        
+        .pdf-icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            vertical-align: middle;
+            transition: background-color 0.2s ease;
+        }
+        
+        .pdf-icon-btn:hover {
+            background-color: #E3F2FD;
+        }
+        
+        .batch-modal-overlay {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 2000;
+            pointer-events: none;
+        }
+        
+        .batch-modal-box {
+            background: white;
+            border-radius: 8px;
+            padding: 20px 24px;
+            text-align: right;
+            min-width: 280px;
+            max-width: 340px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            border: 1px solid var(--border-gray);
+            pointer-events: all;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        
+        .batch-modal-icon {
+            flex-shrink: 0;
+            font-size: 24px;
+            margin-top: 2px;
+        }
+
+        .batch-modal-text {
+            flex: 1;
+        }
+
+        .batch-modal-box h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        
+        .batch-modal-box p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .batch-modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .batch-modal-actions button,
+        .batch-modal-actions a button {
+            font-size: 12px;
+            padding: 6px 14px;
+        }
+        
+        .spinner {
+            width: 22px;
+            height: 22px;
+            border: 3px solid #E0E0E0;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .search-icon {
+        
+        .detail-view {
+            background: var(--bg-white);
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            padding: 32px;
+            max-width: 800px;
+        }
+        
+        .detail-view h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+        
+        .detail-row {
+            margin-bottom: 0;
+        }
+        
+        .detail-label {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+            display: block;
+        }
+        
+        .detail-value {
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+        
+        .detail-divider {
+            grid-column: 1 / -1;
+            height: 1px;
+            background: var(--border-gray);
+            margin: 16px 0;
+        }
+        
+        .detail-full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .status-control {
+            grid-column: 1 / -1;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-gray);
+        }
+        
+        .status-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .status-option {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            background: var(--bg-white);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-family: inherit;
+        }
+        
+        .status-option:hover {
+            border-color: var(--primary-color);
+            background-color: #F5F5F5;
+        }
+        
+        .status-option.selected {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .status-selector-note {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+        
+        .budget-request-control {
+            grid-column: 1 / -1;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-gray);
+        }
+        
+        .budget-request-control button {
+            margin-top: 12px;
+        }
+        
+        .budget-request-note {
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        
+        .budget-request-note.blocked {
+            color: var(--error-red);
+        }
+        
+        .budget-request-note.ready {
+            color: var(--text-secondary);
+        }
+        
+        .restoration-status {
+            grid-column: 1 / -1;
+            padding: 16px;
+            border-radius: 4px;
+            border: 1px solid var(--border-gray);
+            background: var(--bg-light);
+        }
+        
+        .restoration-status .detail-label {
+            margin-bottom: 8px;
+        }
+        
+        .restoration-status-message {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .restoration-status-message.ready {
+            color: var(--success-green);
+        }
+        
+        .restoration-status-message.blocked {
+            color: var(--error-red);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .loading {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px;
+            font-size: 14px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+        }
+        
+        .report-id-input-wrapper {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: end;
+            margin-bottom: 24px;
+        }
+        
+        .report-id-input-wrapper input {
+            grid-column: 1;
+        }
+        
+        .report-id-input-wrapper button {
+            grid-column: 2;
+            padding: 10px 24px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+            
+            .page-header {
+                padding: 20px 0;
+                margin-bottom: 24px;
+            }
+            
+            .header-content h1 {
+                font-size: 22px;
+            }
+            
+            .nav-tabs {
+                padding: 0 16px;
+                overflow-x: auto;
+            }
+            
+            .nav-tabs button {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+            
+            .reports-table th,
+            .reports-table td {
+                padding: 12px 8px;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .form-container {
+                padding: 24px;
+                max-width: 100%;
+            }
+            
+            .detail-view {
+                padding: 24px;
+                max-width: 100%;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .status-selector {
+                flex-direction: column;
+            }
+            
+            .report-id-input-wrapper {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-id-input-wrapper button {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>מערכת דיווח נזקים</h2>
+            <p class="login-subtitle">יש להתחבר כדי להמשיך</p>
+            <div id="login-error"></div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username">שם משתמש</label>
+                    <input type="text" id="login-username" placeholder="הזן שם משתמש" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">סיסמה</label>
+                    <input type="password" id="login-password" placeholder="הזן סיסמה" autocomplete="current-password" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" id="login-btn" style="width:100%;">התחבר</button>
+                </div>
+            </form>
+            <div class="login-hint">
+                <strong>משתמשים לדוגמה:</strong>
+                admin / admin123 &nbsp;·&nbsp; dana / dana123<br>
+                yoav / yoav123 &nbsp;·&nbsp; appraiser1 / appraiser123<br>
+                authority1 / authority123
+            </div>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <h1>מערכת דיווח נזקים</h1>
+                    <p>Damage Reports Management System</p>
+                </div>
+                <div class="header-user-bar">
+                    <span class="header-user-name">שלום, <span id="header-user-fullname"></span></span>
+                    <button type="button" class="logout-btn" onclick="logout()">התנתק</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav-tabs">
+        <button class="tab-btn active" data-tab="reports-list">כל הדיווחים</button>
+        <button class="tab-btn" data-tab="create-report">דיווח חדש</button>
+        <button class="tab-btn" data-tab="report-detail">פרטי דיווח</button>
+        <button class="tab-btn" data-tab="notifications">מרכז הודעות</button>
+        <button class="tab-btn" data-tab="appraisers">פורטל שמאים</button>
+        <button class="tab-btn" data-tab="authority">פורטל רשויות מקומיות</button>
+        <button class="tab-btn" data-tab="settlement-processes">תהליכי אכלוס</button>
+    </div>
+    
+    <div class="container">
+        <div id="message" class="message"></div>
+        
+        <div id="reports-list" class="section active">
+            <div class="search-bar">
+                <div class="search-bar-row">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-input" placeholder="חפש לפי שם מדווח, כתובת או סוג נזק...">
+                    </div>
+                    <div class="city-filter-wrapper">
+                        <select id="city-filter">
+                            <option value="">כל הישובים</option>
+                        </select>
+                    </div>
+                    <button type="button" id="batch-generate-btn" class="batch-generate-btn" onclick="batchGeneratePackages()">
+                        הפק תיקי אכלוס לכל המבנים הזכאים
+                    </button>
+                </div>
+            </div>
+            
+            <div id="reports-loading" class="loading" style="display: none;">
+                ⏳ טוען נתונים...
+            </div>
+
+            <div id="locality-summary" style="display:none; margin-bottom:20px;"></div>
+            
+            <div id="reports-container">
+                <div class="reports-table-wrapper">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>סוג נזק</th>
+                                <th>שם המדווח</th>
+                                <th>כתובת</th>
+                                <th>תאריך הדיווח</th>
+                                <th>סטטוס</th>
+                                <th>זכאי לפתיחת ישוב</th>
+                                <th>מסמך</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 40px;">טוען נתונים...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="create-report" class="section">
+            <div class="form-container">
+                <h2>דיווח נזק חדש</h2>
+                <p>הגש דיווח נזק חדש להערכה וטיפול מהיר</p>
+                <form id="create-form">
+                    <div class="form-group">
+                        <label for="reporterName">שם המדווח</label>
+                        <input type="text" id="reporterName" placeholder="שם מלא" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">כתובת הנזק</label>
+                        <input type="text" id="address" placeholder="כתובת" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="damageType">סוג הנזק</label>
+                        <select id="damageType" required>
+                            <option value="">בחר סוג נזק...</option>
+                            <option value="Water Damage">נזק מים</option>
+                            <option value="Fire Damage">נזק אש</option>
+                            <option value="Structural Damage">נזק מבני</option>
+                            <option value="Storm Damage">נזק סערה</option>
+                            <option value="Pest Damage">נזק מעוררות</option>
+                            <option value="Other">אחר</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">תיאור הנזק</label>
+                        <textarea id="description" placeholder="תאר בפירוט את הנזק שדווח..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="familyEmail">דואר אלקטרוני משפחה</label>
+                        <input type="email" id="familyEmail" placeholder="example@email.com">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit">שלח דיווח</button>
+                        <button type="reset" class="secondary">נקה טופס</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div id="report-detail" class="section">
+            <div style="margin-bottom: 32px;">
+                <label for="report-id-input">הזן מזהה דיווח</label>
+                <div class="report-id-input-wrapper">
+                    <input type="text" id="report-id-input" placeholder="העתק מזהה דיווח מהרשימה...">
+                    <button type="button" onclick="loadReportDetail()">טען</button>
+                </div>
+            </div>
+            <div id="detail-container"></div>
+        </div>
+
+        <div id="notifications" class="section">
+            <div class="notifications-mode-bar">
+                <span class="notifications-mode-label">מצב שרת הודעות:</span>
+                <div class="mode-buttons">
+                    <button type="button" class="mode-btn active" data-mode="success" onclick="setNotificationMode('success')">Success</button>
+                    <button type="button" class="mode-btn" data-mode="always_fail" onclick="setNotificationMode('always_fail')">Always Fail</button>
+                    <button type="button" class="mode-btn" data-mode="fail_first" onclick="setNotificationMode('fail_first')">Fail First Attempt</button>
+                    <button type="button" class="mode-btn" data-mode="random_fail" onclick="setNotificationMode('random_fail')">Random Failure (30%)</button>
+                    <button type="button" class="mode-btn" data-mode="response_lost" onclick="setNotificationMode('response_lost')">Response Lost (Timeout)</button>
+                </div>
+            </div>
+            <div class="reports-table-wrapper">
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>Message ID</th>
+                            <th>Building ID</th>
+                            <th>כתובת המבנה</th>
+                            <th>כתובת מייל</th>
+                            <th>Subject</th>
+                            <th>Date &amp; Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notifications-body">
+                        <tr><td colspan="7" style="text-align:center;padding:40px;">טוען...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="appraisers" class="section">
+            <div id="appraisers-list-view">
+                <div class="reports-table-wrapper">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>כתובת המבנה</th>
+                                <th>ישוב</th>
+                                <th>סטטוס טיפול</th>
+                                <th>סטטוס הערכה</th>
+                                <th>פעולה</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appraisers-table-body">
+                            <tr><td colspan="5" style="text-align:center;padding:40px;">טוען...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="appraisers-form-view" style="display:none;">
+                <div class="form-container" style="max-width:560px;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                        <button type="button" class="secondary" onclick="showAppraisersListView()">← חזרה לרשימה</button>
+                        <h2 style="margin:0;font-size:20px;">הזנת הערכת נזק</h2>
+                    </div>
+                    <p id="appraisers-form-address" style="font-weight:600;color:var(--primary-color);margin-bottom:24px;"></p>
+                    <form id="assessment-form">
+                        <input type="hidden" id="assessment-report-id">
+                        <div class="form-group">
+                            <label for="severity">חומרת הנזק</label>
+                            <select id="severity" required>
+                                <option value="">בחר חומרת נזק...</option>
+                                <option value="low">נמוכה</option>
+                                <option value="medium">בינונית</option>
+                                <option value="severe">חמורה</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="appraisal-notes">הערות שמאי</label>
+                            <textarea id="appraisal-notes" placeholder="הזן הערות מקצועיות..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="inspection-date">תאריך בדיקה</label>
+                            <input type="date" id="inspection-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="follow-up">נדרשת בדיקת מעקב</label>
+                            <select id="follow-up">
+                                <option value="false">לא</option>
+                                <option value="true">כן</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit">שמור הערכה</button>
+                            <button type="button" class="secondary" onclick="showAppraisersListView()">ביטול</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="authority" class="section">
+            <div id="authority-list-view">
+                <div class="reports-table-wrapper">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>כתובת המבנה</th>
+                                <th>ישוב</th>
+                                <th>סטטוס טיפול</th>
+                                <th>סטטוס אישור רשות</th>
+                                <th>פעולה</th>
+                            </tr>
+                        </thead>
+                        <tbody id="authority-table-body">
+                            <tr><td colspan="5" style="text-align:center;padding:40px;">טוען...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="authority-form-view" style="display:none;">
+                <div class="form-container" style="max-width:560px;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                        <button type="button" class="secondary" onclick="showAuthorityListView()">← חזרה לרשימה</button>
+                        <h2 style="margin:0;font-size:20px;">עדכון מצב תשתיות</h2>
+                    </div>
+                    <p id="authority-form-address" style="font-weight:600;color:var(--primary-color);margin-bottom:24px;"></p>
+                    <form id="authority-form">
+                        <input type="hidden" id="authority-report-id">
+
+                        <div class="form-group">
+                            <label for="water-supply">אספקת מים תקינה</label>
+                            <select id="water-supply">
+                                <option value="false">לא</option>
+                                <option value="true">כן</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="electricity-supply">אספקת חשמל תקינה</label>
+                            <select id="electricity-supply">
+                                <option value="false">לא</option>
+                                <option value="true">כן</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="access-roads">דרכי גישה פתוחות</label>
+                            <select id="access-roads">
+                                <option value="false">לא</option>
+                                <option value="true">כן</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="hazards-cleared">מפגעים סביבתיים פונו</label>
+                            <select id="hazards-cleared">
+                                <option value="false">לא</option>
+                                <option value="true">כן</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="authority-notes">הערות הרשות המקומית</label>
+                            <textarea id="authority-notes" placeholder="הזן הערות..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="authority-approved">אישור רשות מקומית</label>
+                            <select id="authority-approved">
+                                <option value="false">לא</option>
+                                <option value="true">כן</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit">שמור אישור</button>
+                            <button type="button" class="secondary" onclick="showAuthorityListView()">ביטול</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="settlement-processes" class="section">
+            <div class="reports-table-wrapper">
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>ישוב</th>
+                            <th>הופעל על ידי</th>
+                            <th>זמן התחלה</th>
+                            <th>זמן סיום</th>
+                            <th>סטטוס</th>
+                        </tr>
+                    </thead>
+                    <tbody id="settlement-processes-body">
+                        <tr><td colspan="5" style="text-align:center;padding:40px;">⏳ טוען...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:3001';
+        const RETURN_HOME_API_BASE = window.location.protocol === 'file:' || !window.location.host
+            ? 'http://localhost:3002'
+            : 'http://localhost:3002';
+        const NOTIFICATION_API_BASE = 'http://localhost:3003';
+        const AUTH_API_BASE = 'http://localhost:3006';
+
+        // Current logged-in user — populated after login
+        let currentUser = null; // { token, userId, fullName, username }
+
+        let allReports = [];
+        // מפה: reportId -> { url, fileName }
+        const generatedDocs = {};
+        
+        // =====================
+        // Authentication
+        // =====================
+
+        async function initAuth() {
+            const savedToken = sessionStorage.getItem('authToken');
+            if (savedToken) {
+                try {
+                    const res = await fetch(`${AUTH_API_BASE}/auth/me`, {
+                        headers: { 'x-auth-token': savedToken }
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        currentUser = {
+                            token: savedToken,
+                            userId: data.data.userId,
+                            fullName: data.data.fullName,
+                            username: data.data.username
+                        };
+                        showApp();
+                        return;
+                    }
+                } catch {}
+                sessionStorage.removeItem('authToken');
+            }
+            showLoginOverlay();
+        }
+
+        function showLoginOverlay() {
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+
+        function hideLoginOverlay() {
+            document.getElementById('login-overlay').style.display = 'none';
+        }
+
+        function showApp() {
+            hideLoginOverlay();
+            document.getElementById('header-user-fullname').textContent = currentUser.fullName;
+            loadReportsList();
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const errEl = document.getElementById('login-error');
+            btn.disabled = true;
+            btn.textContent = '⏳ מתחבר...';
+            errEl.style.display = 'none';
+
+            try {
+                const res = await fetch(`${AUTH_API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('login-username').value,
+                        password: document.getElementById('login-password').value
+                    })
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'שגיאה בהתחברות');
+
+                currentUser = {
+                    token: data.data.token,
+                    userId: data.data.userId,
+                    fullName: data.data.fullName,
+                    username: data.data.username
+                };
+                sessionStorage.setItem('authToken', data.data.token);
+                showApp();
+            } catch (err) {
+                errEl.textContent = err.message;
+                errEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'התחבר';
+            }
+        });
+
+        async function logout() {
+            if (currentUser) {
+                try {
+                    await fetch(`${AUTH_API_BASE}/auth/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-auth-token': currentUser.token
+                        }
+                    });
+                } catch {}
+            }
+            currentUser = null;
+            sessionStorage.removeItem('authToken');
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+            showLoginOverlay();
+        }
+
+        // Helper — returns user context fields to include in API call bodies
+        function userContext() {
+            if (!currentUser) return {};
+            return { userId: currentUser.userId, userName: currentUser.fullName };
+        }
+
+        function getStatusBadgeClass(status) {
+            const classes = {
+                NEW: 'new',
+                IN_REVIEW: 'in-review',
+                WAITING_FOR_VALIDATION: 'waiting',
+                IN_RESTORATION: 'in-restoration',
+                RESTORATION_COMPLETED: 'restoration-completed'
+            };
+            return classes[status] || 'new';
+        }
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+                
+                if (tabName === 'reports-list') {
+                    loadReportsList();
+                } else if (tabName === 'notifications') {
+                    loadNotifications();
+                } else if (tabName === 'appraisers') {
+                    loadAppraisersPortal();
+                } else if (tabName === 'authority') {
+                    loadAuthorityPortal();
+                } else if (tabName === 'settlement-processes') {
+                    loadSettlementProcesses();
+                }
+            });
+        });
+        
+        document.getElementById('search-input').addEventListener('input', applyFilters);
+        document.getElementById('city-filter').addEventListener('change', applyFilters);
+        
+        function showMessage(text, type = 'success') {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            setTimeout(() => {
+                messageEl.className = 'message';
+            }, 4000);
+        }
+        
+        async function loadNotifications() {
+            const tbody = document.getElementById('notifications-body');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">⏳ טוען...</td></tr>';
+            try {
+                const [notifRes, reportsRes, modeRes] = await Promise.all([
+                    fetch(`${NOTIFICATION_API_BASE}/notifications`),
+                    fetch(`${API_BASE}/reports`),
+                    fetch(`${NOTIFICATION_API_BASE}/notifications/mode`)
+                ]);
+                const notifData = await notifRes.json();
+                const reportsData = await reportsRes.json();
+                const modeData = await modeRes.json();
+
+                // עדכן כפתורי מצב
+                if (modeData.success) {
+                    document.querySelectorAll('.mode-btn').forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.mode === modeData.mode);
+                    });
+                }
+
+                const addressMap = {};
+                if (reportsData.success) {
+                    reportsData.data.forEach(r => { addressMap[r.id] = r.address; });
+                }
+
+                const notifications = notifData.data || [];
+                if (notifications.length === 0) {
+                    tbody.innerHTML = `
+                        <tr><td colspan="7">
+                            <div class="empty-state" style="padding:40px;margin:0;">
+                                <div class="empty-state-icon">📭</div>
+                                <h3>אין הודעות</h3>
+                                <p>הודעות יופיעו כאן לאחר הפקת תיקי אכלוס</p>
+                            </div>
+                        </td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = [...notifications].reverse().map(n => {
+                    const dt = new Date(n.dateTime);
+                    const dateStr = dt.toLocaleDateString('he-IL');
+                    const timeStr = dt.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+                    const address = addressMap[n.buildingId] || '—';
+                    const shortMsgId = n.messageId.split('-')[0];
+                    const shortBldId = n.buildingId.split('-')[0];
+                    const statusClass = n.status === 'SENT' ? 'restoration-completed' : 'failed';
+                    return `
+                        <tr>
+                            <td style="font-family:monospace;font-size:12px;" title="${n.messageId}">${shortMsgId}…</td>
+                            <td style="font-family:monospace;font-size:12px;" title="${n.buildingId}">${shortBldId}…</td>
+                            <td>${address}</td>
+                            <td>${n.email}</td>
+                            <td>${n.subject}</td>
+                            <td>${dateStr} ${timeStr}</td>
+                            <td><span class="status-badge ${statusClass}">${n.status}</span></td>
+                        </tr>`;
+                }).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:20px;">שגיאה בטעינת הודעות: ${err.message}</td></tr>`;
+            }
+        }
+
+        async function setNotificationMode(mode) {
+            try {
+                const res = await fetch(`${NOTIFICATION_API_BASE}/notifications/mode`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode })
+                });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.mode === mode);
+                });
+                showMessage(`מצב שרת ההודעות שונה ל: ${mode}`, 'success');
+            } catch (err) {
+                showMessage('שגיאה בשינוי מצב: ' + err.message, 'error');
+            }
+        }
+
+        async function loadReportsList() {
+            const loading = document.getElementById('reports-loading');
+            
+            try {
+                loading.style.display = 'block';
+                const response = await fetch(`${API_BASE}/reports`);
+                const result = await response.json();
+                
+                if (!result.success) throw new Error('Failed to load reports');
+                
+                allReports = result.data;
+                populateCityFilter(allReports);
+                applyFilters();
+            } catch (error) {
+                showMessage('שגיאה בטעינת דיווחים: ' + error.message, 'error');
+                document.getElementById('table-body').innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                                <p>לא ניתן לטעון דיווחים. בדוק את החיבור לשרת.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function extractCity(address) {
+            // מניח שהעיר היא המילה האחרונה לאחר הפסיק האחרון
+            const parts = address.split(',');
+            return parts[parts.length - 1].trim();
+        }
+
+        function populateCityFilter(reports) {
+            const citySet = new Set();
+            reports.forEach(r => {
+                const city = extractCity(r.address);
+                if (city) citySet.add(city);
+            });
+            const select = document.getElementById('city-filter');
+            const current = select.value;
+            // שמור רק option ריק
+            select.innerHTML = '<option value="">כל הישובים</option>';
+            [...citySet].sort().forEach(city => {
+                const opt = document.createElement('option');
+                opt.value = city;
+                opt.textContent = city;
+                select.appendChild(opt);
+            });
+            select.value = current;
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const city = document.getElementById('city-filter').value;
+
+            let filtered = allReports;
+            if (city) {
+                filtered = filtered.filter(r => extractCity(r.address) === city);
+            }
+            if (query) {
+                filtered = filtered.filter(r =>
+                    r.reporterName.toLowerCase().includes(query) ||
+                    r.address.toLowerCase().includes(query) ||
+                    r.damageType.toLowerCase().includes(query)
+                );
+            }
+
+            // עדכן שם הכפתור
+            const btn = document.getElementById('batch-generate-btn');
+            btn.textContent = city
+                ? `הפק תיקי אכלוס לכל היישוב`
+                : 'הפק תיקי אכלוס לכל המבנים הזכאים';
+
+            // כרטיס סיכום ישוב
+            renderLocalitySummary(city ? filtered : null);
+
+            renderReports(filtered);
+        }
+
+        function renderLocalitySummary(reports) {
+            const card = document.getElementById('locality-summary');
+            if (!reports) { card.style.display = 'none'; return; }
+
+            const total      = reports.length;
+            const eligible   = reports.filter(r => r.localityEligible).length;
+            const ineligible = total - eligible;
+            const noAssessment  = reports.filter(r => !r.assessment).length;
+            const noAuthority   = reports.filter(r => !r.authorityApproval?.approved).length;
+            const otherReasons  = ineligible - noAssessment - noAuthority < 0 ? 0
+                                : ineligible - noAssessment - noAuthority;
+
+            card.style.display = '';
+            card.innerHTML = `
+                <div class="locality-summary-card">
+                    <h3>סטטוס ישוב — מוכנות לפתיחה מחדש</h3>
+                    <div class="locality-summary-stats">
+                        <div class="locality-stat">
+                            <span class="locality-stat-number">${total}</span>
+                            <span class="locality-stat-label">סה"כ מבנים</span>
+                        </div>
+                        <div class="locality-stat eligible">
+                            <span class="locality-stat-number">${eligible}</span>
+                            <span class="locality-stat-label">זכאים לפתיחה</span>
+                        </div>
+                        <div class="locality-stat ineligible">
+                            <span class="locality-stat-number">${ineligible}</span>
+                            <span class="locality-stat-label">אינם זכאים עדיין</span>
+                        </div>
+                        <div class="locality-stat pending">
+                            <span class="locality-stat-number">${noAssessment}</span>
+                            <span class="locality-stat-label">ממתינים להערכת שמאי</span>
+                        </div>
+                        <div class="locality-stat pending">
+                            <span class="locality-stat-number">${noAuthority}</span>
+                            <span class="locality-stat-label">ממתינים לאישור רשות</span>
+                        </div>
+                        <div class="locality-stat ineligible">
+                            <span class="locality-stat-number">${otherReasons}</span>
+                            <span class="locality-stat-label">לא זכאים מסיבות אחרות</span>
+                        </div>
+                    </div>
+                </div>`;
+        }
+        
+        function renderReports(reports) {
+            const tbody = document.getElementById('table-body');
+            
+            if (reports.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state" style="padding: 40px; margin: 0;">
+                                <div class="empty-state-icon">📭</div>
+                                <h3>אין דיווחים</h3>
+                                <p>התחל בהגשת דיווח חדש או שנה את הפילטרים</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = reports.map((report) => {
+                const createdDate = new Date(report.createdAt);
+                const statusClass = getStatusBadgeClass(report.status);
+                const statusText = report.statusLabel || report.status;
+                const doc = generatedDocs[report.id];
+                const eligibleBadge = report.localityEligible
+                    ? `<span class="status-badge restoration-completed">כן</span>`
+                    : `<span class="status-badge failed">לא</span>`;
+                
+                return `
+                    <tr onclick="loadDetailedReport('${report.id}')">
+                        <td class="damage-type-cell">${report.damageType}</td>
+                        <td>${report.reporterName}</td>
+                        <td>${report.address}</td>
+                        <td>${createdDate.toLocaleDateString('he-IL')}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </td>
+                        <td style="text-align:center;">${eligibleBadge}</td>
+                        <td style="text-align:center;">
+                            ${doc ? `
+                                <button type="button" class="pdf-icon-btn" title="פתח מסמך" onclick="event.stopPropagation(); window.open('${doc.url}', '_blank')">📄</button>
+                            ` : ''}
+                        </td>
+                        <td>
+                            ${report.canGenerateReturnHomePackage ? `
+                                <button
+                                    type="button"
+                                    class="action-btn"
+                                    onclick="generateReturnHomePackage(event, '${report.id}')"
+                                >
+                                    הפק תיק אכלוס מחדש
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        async function downloadFile(fileUrl, fileName) {
+            try {
+                const response = await fetch(fileUrl);
+                if (!response.ok) throw new Error('שגיאה בהורדת הקובץ');
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                showMessage('שגיאה בהורדת הקובץ: ' + error.message, 'error');
+            }
+        }
+
+        function showPackageModal(fileUrl, fileName) {
+            const existingModal = document.getElementById('package-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            const modal = document.createElement('div');
+            modal.id = 'package-modal';
+            modal.className = 'package-modal';
+            modal.innerHTML = `
+                <div class="package-modal-content">
+                    <h3>תיק אכלוס מחדש הופק בהצלחה</h3>
+                    <p>ניתן לצפות במסמך או להוריד אותו למחשב.</p>
+                    <div class="package-modal-actions">
+                        <a href="${fileUrl}" target="_blank" rel="noopener noreferrer">
+                            <button type="button">צפייה במסמך</button>
+                        </a>
+                        <button type="button" class="secondary" onclick="downloadFile('${fileUrl}', '${fileName}')">הורדה</button>
+                        <button type="button" class="secondary" onclick="closePackageModal()">סגור</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closePackageModal();
+                }
+            });
+            
+            document.body.appendChild(modal);
+        }
+        
+        function closePackageModal() {
+            const modal = document.getElementById('package-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // --- פאנל צף בפינה (לא חוסם) ---
+        function showStatusModal({ spinner = false, icon = '', title, body = '', closeable = false, actions = '' }) {
+            let modal = document.getElementById('status-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'status-modal';
+                modal.className = 'batch-modal-overlay';
+                document.body.appendChild(modal);
+            }
+            modal.innerHTML = `
+                <div class="batch-modal-box">
+                    ${spinner
+                        ? '<div class="spinner"></div>'
+                        : `<div class="batch-modal-icon">${icon}</div>`}
+                    <div class="batch-modal-text">
+                        <h3>${title}</h3>
+                        ${body ? `<p id="modal-body">${body}</p>` : ''}
+                        ${actions ? `<div class="batch-modal-actions">${actions}</div>` : ''}
+                        ${closeable ? `<div class="batch-modal-actions"><button type="button" class="secondary" onclick="closeStatusModal()">סגור</button></div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateModalBody(text) {
+            const el = document.getElementById('modal-body');
+            if (el) el.textContent = text;
+        }
+
+        function closeStatusModal() {
+            document.getElementById('status-modal')?.remove();
+        }
+
+        // --- הפקה בודדת ---
+        async function generateReturnHomePackage(event, reportId) {
+            event.stopPropagation();
+
+            const button = event.currentTarget;
+            button.disabled = true;
+
+            showStatusModal({ spinner: true, title: 'מפיק תיק אכלוס...', body: 'אנא המתן' });
+
+            try {
+                const response = await fetch(`${RETURN_HOME_API_BASE}/buildings/${reportId}/return-home-package`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                if (!result.success) throw new Error(result.error || 'Failed to generate package');
+
+                generatedDocs[reportId] = { url: result.data.url, fileName: result.data.fileName };
+                applyFilters();
+
+                showStatusModal({
+                    icon: '✅',
+                    title: 'התיק הופק בהצלחה!',
+                    actions: `
+                        <a href="${result.data.url}" target="_blank" rel="noopener noreferrer"><button type="button">צפייה</button></a>
+                        <button type="button" class="secondary" onclick="downloadFile('${result.data.url}','${result.data.fileName}')">הורדה</button>
+                        <button type="button" class="secondary" onclick="closeStatusModal()">סגור</button>
+                    `
+                });
+
+            } catch (error) {
+                closeStatusModal();
+                showMessage('שגיאה בהפקת תיק אכלוס: ' + error.message, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        // --- הפקה מרוכזת ---
+        async function batchGeneratePackages() {
+            const city = document.getElementById('city-filter').value;
+            const query = document.getElementById('search-input').value.toLowerCase();
+
+            let filtered = allReports;
+            if (city) filtered = filtered.filter(r => extractCity(r.address) === city);
+            if (query) filtered = filtered.filter(r =>
+                r.reporterName.toLowerCase().includes(query) ||
+                r.address.toLowerCase().includes(query) ||
+                r.damageType.toLowerCase().includes(query)
+            );
+
+            const eligible = filtered.filter(r => r.canGenerateReturnHomePackage);
+
+            if (eligible.length === 0) {
+                showMessage('אין מבנים זכאים להפקת תיק בפילטר הנוכחי', 'error');
+                return;
+            }
+
+            const settlementName = city || 'כל הישובים';
+            const startedBy = currentUser ? currentUser.fullName : 'לא ידוע';
+
+            showStatusModal({
+                spinner: true,
+                title: 'מפיק תיקים...',
+                body: `${eligible.length} מבנים`
+            });
+
+            try {
+                const response = await fetch(`${RETURN_HOME_API_BASE}/buildings/batch/return-home-packages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ids: eligible.map(r => r.id),
+                        settlementName,
+                        startedBy
+                    })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    // שמור את כל המסמכים שהופקו
+                    (result.generated || []).forEach(g => {
+                        generatedDocs[g.id] = { url: g.url, fileName: g.fileName };
+                    });
+                    applyFilters();
+                    showStatusModal({
+                        icon: '✅',
+                        title: 'ההפקה הושלמה',
+                        body: `הופקו ${result.count} תיקי חזרה לבית`,
+                        closeable: true
+                    });
+                } else {
+                    closeStatusModal();
+                    showMessage('שגיאה בהפקה: ' + (result.error || 'שגיאה לא ידועה'), 'error');
+                }
+            } catch (err) {
+                closeStatusModal();
+                showMessage('שגיאה בהפקה: ' + err.message, 'error');
+            }
+        }
+        
+        async function openBudgetRequest(reportId) {
+            try {
+                const response = await fetch(`${API_BASE}/reports/${reportId}/budget-request`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...userContext() })
+                });
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to open budget request');
+                }
+                
+                showMessage('בקשת התקציב נפתחה בהצלחה', 'success');
+                await loadReportDetail(reportId);
+                await loadReportsList();
+            } catch (error) {
+                showMessage('שגיאה בפתיחת בקשת תקציב: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadDetailedReport(reportId) {
+            document.getElementById('report-id-input').value = reportId;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelector('[data-tab="report-detail"]').classList.add('active');
+            document.getElementById('report-detail').classList.add('active');
+            
+            await loadReportDetail(reportId);
+        }
+        
+        async function loadReportDetail(reportId = null) {
+            const id = reportId || document.getElementById('report-id-input').value;
+            const container = document.getElementById('detail-container');
+            
+            if (!id) {
+                showMessage('אנא הזן מזהה דיווח', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/reports/${id}`);
+                const result = await response.json();
+                
+                if (!result.success) throw new Error('Report not found');
+                
+                const report = result.data;
+                const createdDate = new Date(report.createdAt);
+                
+                container.innerHTML = `
+                    <div class="detail-view">
+                        <h2>${report.damageType}</h2>
+                        
+                        <div class="detail-grid">
+                            <div class="detail-row">
+                                <span class="detail-label">מזהה דיווח</span>
+                                <div class="detail-value" style="font-family: monospace; font-size: 13px;">${report.id}</div>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">שם המדווח</span>
+                                <div class="detail-value">${report.reporterName}</div>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">כתובת הנזק</span>
+                                <div class="detail-value">${report.address}</div>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">תאריך הדיווח</span>
+                                <div class="detail-value">${createdDate.toLocaleDateString('he-IL')} בשעה ${createdDate.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'})}</div>
+                            </div>
+                            
+                            <div class="detail-divider"></div>
+                            
+                            <div class="detail-row detail-full-width">
+                                <span class="detail-label">תיאור הנזק</span>
+                                <div class="detail-value">${report.description}</div>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">אישור חברתי</span>
+                                <div class="detail-value">${report.socialApprovalDisplay}</div>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label">דואר אלקטרוני משפחה</span>
+                                <div class="detail-value">${report.familyEmail || '—'}</div>
+                            </div>
+                            
+                            <div class="restoration-status">
+                                <span class="detail-label">מוכנות לשיקום</span>
+                                <div class="restoration-status-message ${report.canStartRestoration ? 'ready' : 'blocked'}">
+                                    ${report.restorationMessage}
+                                </div>
+                            </div>
+                            
+                            <div class="detail-divider"></div>
+                            
+                            <div class="status-control">
+                                <span class="detail-label">סטטוס נוכחי</span>
+                                
+                                <div class="status-selector">
+                                    <button type="button" class="status-option ${report.status === 'NEW' ? 'selected' : ''}" onclick="quickUpdateStatus('${report.id}', 'NEW')">
+                                        חדש
+                                    </button>
+                                    <button type="button" class="status-option ${report.status === 'IN_REVIEW' ? 'selected' : ''}" onclick="quickUpdateStatus('${report.id}', 'IN_REVIEW')">
+                                        בטיפול
+                                    </button>
+                                    <button type="button" class="status-option ${report.status === 'WAITING_FOR_VALIDATION' ? 'selected' : ''}" onclick="quickUpdateStatus('${report.id}', 'WAITING_FOR_VALIDATION')">
+                                        בהמתנה לאישור
+                                    </button>
+                                    <button type="button" class="status-option ${report.status === 'IN_RESTORATION' ? 'selected' : ''}" onclick="quickUpdateStatus('${report.id}', 'IN_RESTORATION')">
+                                        מבנה בתהליך שיקום
+                                    </button>
+                                    <button type="button" class="status-option ${report.status === 'RESTORATION_COMPLETED' ? 'selected' : ''}" onclick="quickUpdateStatus('${report.id}', 'RESTORATION_COMPLETED')">
+                                        תהליך שיקום הסתיים
+                                    </button>
+                                </div>
+                                
+                                <p class="status-selector-note">
+                                    בחר סטטוס כדי לעדכן את עדיפות הטיפול בדיווח
+                                </p>
+                            </div>
+                            
+                            <div class="budget-request-control">
+                                <span class="detail-label">בקשת תקציב</span>
+                                <button
+                                    type="button"
+                                    ${report.canOpenBudgetRequest && !report.hasBudgetRequest ? '' : 'disabled'}
+                                    onclick="openBudgetRequest('${report.id}')"
+                                >
+                                    ${report.hasBudgetRequest ? 'בקשת תקציב נפתחה' : 'פתח בקשת תקציב'}
+                                </button>
+                                <p class="budget-request-note ${report.canOpenBudgetRequest ? 'ready' : 'blocked'}">
+                                    ${report.hasBudgetRequest
+                                        ? 'בקשת תקציב קיימת'
+                                        : report.canOpenBudgetRequest
+                                            ? 'כל התנאים מתקיימים — ניתן לפתוח בקשת תקציב'
+                                            : 'לא ניתן לפתוח בקשת תקציב: ' + report.budgetRequestMissing.join(' · ')}
+                                </p>
+                            </div>
+                            
+                            ${report.canGenerateReturnHomePackage ? `
+                            <div class="budget-request-control">
+                                <span class="detail-label">תיק אכלוס מחדש</span>
+                                <button
+                                    type="button"
+                                    onclick="generateReturnHomePackage(event, '${report.id}')"
+                                >
+                                    הפק תיק אכלוס מחדש
+                                </button>
+                            </div>
+                            ` : ''}
+
+                            ${report.assessment ? `
+                            <div class="assessment-section">
+                                <span class="detail-label">הערכת שמאי</span>
+                                <div class="assessment-grid">
+                                    <div class="detail-row">
+                                        <span class="detail-label">חומרת נזק</span>
+                                        <div class="detail-value">
+                                            <span class="status-badge ${SEVERITY_CLASSES[report.assessment.severity] || ''}">${SEVERITY_LABELS[report.assessment.severity] || report.assessment.severity}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">תאריך בדיקה</span>
+                                        <div class="detail-value">${report.assessment.inspectionDate}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">בדיקת מעקב נדרשת</span>
+                                        <div class="detail-value">${report.assessment.followUpRequired ? 'כן' : 'לא'}</div>
+                                    </div>
+                                    ${report.assessment.notes ? `
+                                    <div class="detail-row detail-full-width">
+                                        <span class="detail-label">הערות שמאי</span>
+                                        <div class="detail-value">${report.assessment.notes}</div>
+                                    </div>` : ''}
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            ${report.authorityApproval ? `
+                            <div class="assessment-section">
+                                <span class="detail-label">אישור רשות מקומית</span>
+                                <div class="assessment-grid">
+                                    <div class="detail-row">
+                                        <span class="detail-label">סטטוס אישור</span>
+                                        <div class="detail-value">
+                                            <span class="status-badge ${report.authorityApproval.approved ? 'restoration-completed' : 'failed'}">${report.authorityApproval.approved ? 'אושר' : 'לא אושר'}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">אספקת מים</span>
+                                        <div class="detail-value">${report.authorityApproval.waterSupply ? '✅ תקינה' : '❌ לא תקינה'}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">אספקת חשמל</span>
+                                        <div class="detail-value">${report.authorityApproval.electricitySupply ? '✅ תקינה' : '❌ לא תקינה'}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">דרכי גישה</span>
+                                        <div class="detail-value">${report.authorityApproval.accessRoads ? '✅ פתוחות' : '❌ חסומות'}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">מפגעים סביבתיים</span>
+                                        <div class="detail-value">${report.authorityApproval.hazardsCleared ? '✅ פונו' : '❌ טרם פונו'}</div>
+                                    </div>
+                                    ${report.authorityApproval.notes ? `
+                                    <div class="detail-row detail-full-width">
+                                        <span class="detail-label">הערות הרשות</span>
+                                        <div class="detail-value">${report.authorityApproval.notes}</div>
+                                    </div>` : ''}
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                showMessage('שגיאה בטעינת הדיווח: ' + error.message, 'error');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <h3>דיווח לא נמצא</h3>
+                        <p>לא ניתן לטעון את הדיווח. בדוק את המזהה ונסה שוב.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function quickUpdateStatus(reportId, newStatus) {
+            try {
+                const response = await fetch(`${API_BASE}/reports/${reportId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus, ...userContext() })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) throw new Error('Failed to update status');
+                
+                showMessage(`סטטוס עודכן ל: ${result.data.statusLabel}`, 'success');
+                
+                await loadReportDetail(reportId);
+                await loadReportsList();
+            } catch (error) {
+                showMessage('שגיאה בעדכון סטטוס: ' + error.message, 'error');
+            }
+        }
+        
+        document.getElementById('create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '⏳ שולח...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/reports`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        reporterName: document.getElementById('reporterName').value,
+                        address: document.getElementById('address').value,
+                        damageType: document.getElementById('damageType').value,
+                        description: document.getElementById('description').value,
+                        familyEmail: document.getElementById('familyEmail').value
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) throw new Error('Failed to create report');
+                
+                showMessage('✓ הדיווח נשלח בהצלחה!', 'success');
+                document.getElementById('create-form').reset();
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.tab-btn')[0].click();
+                }, 500);
+            } catch (error) {
+                showMessage('שגיאה בהגשת דיווח: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+        
+        // =====================
+        // פורטל שמאים
+        // =====================
+        const SEVERITY_LABELS = { low: 'נמוכה', medium: 'בינונית', severe: 'חמורה' };
+        const SEVERITY_CLASSES = { low: 'severity-low', medium: 'severity-medium', severe: 'severity-severe' };
+
+        async function loadAppraisersPortal() {
+            const tbody = document.getElementById('appraisers-table-body');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">⏳ טוען...</td></tr>';
+            showAppraisersListView();
+            try {
+                const res = await fetch(`${API_BASE}/reports`);
+                const data = await res.json();
+                if (!data.success) throw new Error('Failed to load');
+                const reports = data.data;
+                if (reports.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">אין מבנים</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = reports.map(r => {
+                    const city = r.address.split(',').pop().trim();
+                    const hasAssessment = !!r.assessment;
+                    return `<tr>
+                        <td>${r.address}</td>
+                        <td>${city}</td>
+                        <td><span class="status-badge ${getStatusBadgeClass(r.status)}">${r.statusLabel}</span></td>
+                        <td>${hasAssessment
+                            ? `<span class="status-badge restoration-completed">קיימת הערכה</span>`
+                            : `<span class="status-badge new">ממתין להערכה</span>`}</td>
+                        <td><button type="button" class="action-btn" onclick="openAssessmentForm('${r.id}','${r.address.replace(/'/g,"\\'")}')">הזן הערכה</button></td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="5" style="color:red;text-align:center;padding:20px;">שגיאה: ${e.message}</td></tr>`;
+            }
+        }
+
+        function showAppraisersListView() {
+            document.getElementById('appraisers-list-view').style.display = '';
+            document.getElementById('appraisers-form-view').style.display = 'none';
+        }
+
+        function openAssessmentForm(reportId, address) {
+            document.getElementById('assessment-report-id').value = reportId;
+            document.getElementById('appraisers-form-address').textContent = address;
+            document.getElementById('assessment-form').reset();
+            document.getElementById('assessment-report-id').value = reportId;
+            document.getElementById('inspection-date').valueAsDate = new Date();
+            document.getElementById('appraisers-list-view').style.display = 'none';
+            document.getElementById('appraisers-form-view').style.display = '';
+        }
+
+        document.getElementById('assessment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            const reportId = document.getElementById('assessment-report-id').value;
+            try {
+                const res = await fetch(`${API_BASE}/reports/${reportId}/assessment`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        severity: document.getElementById('severity').value,
+                        notes: document.getElementById('appraisal-notes').value,
+                        inspectionDate: document.getElementById('inspection-date').value,
+                        followUpRequired: document.getElementById('follow-up').value === 'true',
+                        ...userContext()
+                    })
+                });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+                showMessage('הערכת השמאי נשמרה בהצלחה', 'success');
+                showAppraisersListView();
+                loadAppraisersPortal();
+            } catch (err) {
+                showMessage('שגיאה בשמירה: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // =====================
+        // פורטל רשויות מקומיות
+        // =====================
+
+        async function loadAuthorityPortal() {
+            const tbody = document.getElementById('authority-table-body');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">⏳ טוען...</td></tr>';
+            showAuthorityListView();
+            try {
+                const res = await fetch(`${API_BASE}/reports`);
+                const data = await res.json();
+                if (!data.success) throw new Error('Failed to load');
+                const reports = data.data;
+                if (reports.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">אין מבנים</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = reports.map(r => {
+                    const city = r.address.split(',').pop().trim();
+                    const hasApproval = !!r.authorityApproval;
+                    const approved = r.authorityApproval?.approved;
+                    return `<tr>
+                        <td>${r.address}</td>
+                        <td>${city}</td>
+                        <td><span class="status-badge ${getStatusBadgeClass(r.status)}">${r.statusLabel}</span></td>
+                        <td>${hasApproval
+                            ? (approved
+                                ? `<span class="status-badge restoration-completed">אושר</span>`
+                                : `<span class="status-badge failed">לא אושר</span>`)
+                            : `<span class="status-badge new">ממתין לאישור</span>`}</td>
+                        <td><button type="button" class="action-btn" onclick="openAuthorityForm('${r.id}','${r.address.replace(/'/g,"\\'")}',${JSON.stringify(r.authorityApproval||null).replace(/"/g,'&quot;')})">עדכן תשתיות</button></td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="5" style="color:red;text-align:center;padding:20px;">שגיאה: ${e.message}</td></tr>`;
+            }
+        }
+
+        function showAuthorityListView() {
+            document.getElementById('authority-list-view').style.display = '';
+            document.getElementById('authority-form-view').style.display = 'none';
+        }
+
+        function openAuthorityForm(reportId, address, existingData) {
+            document.getElementById('authority-report-id').value = reportId;
+            document.getElementById('authority-form-address').textContent = address;
+            const d = typeof existingData === 'string' ? JSON.parse(existingData) : existingData;
+            document.getElementById('water-supply').value        = d ? String(d.waterSupply)        : 'false';
+            document.getElementById('electricity-supply').value  = d ? String(d.electricitySupply)  : 'false';
+            document.getElementById('access-roads').value        = d ? String(d.accessRoads)        : 'false';
+            document.getElementById('hazards-cleared').value     = d ? String(d.hazardsCleared)     : 'false';
+            document.getElementById('authority-notes').value     = d ? (d.notes || '')              : '';
+            document.getElementById('authority-approved').value  = d ? String(d.approved)           : 'false';
+            document.getElementById('authority-list-view').style.display = 'none';
+            document.getElementById('authority-form-view').style.display = '';
+        }
+
+        document.getElementById('authority-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            const reportId = document.getElementById('authority-report-id').value;
+            try {
+                const res = await fetch(`${API_BASE}/reports/${reportId}/authority-approval`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        waterSupply:        document.getElementById('water-supply').value === 'true',
+                        electricitySupply:  document.getElementById('electricity-supply').value === 'true',
+                        accessRoads:        document.getElementById('access-roads').value === 'true',
+                        hazardsCleared:     document.getElementById('hazards-cleared').value === 'true',
+                        notes:              document.getElementById('authority-notes').value,
+                        approved:           document.getElementById('authority-approved').value === 'true',
+                        ...userContext()
+                    })
+                });
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+                showMessage('אישור הרשות המקומית נשמר בהצלחה', 'success');
+                showAuthorityListView();
+                loadAuthorityPortal();
+            } catch (err) {
+                showMessage('שגיאה בשמירה: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // =====================
+        // תהליכי אכלוס
+        // =====================
+
+        async function loadSettlementProcesses() {
+            const tbody = document.getElementById('settlement-processes-body');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">⏳ טוען...</td></tr>';
+            try {
+                const res = await fetch(`${RETURN_HOME_API_BASE}/settlement-processes`);
+                const data = await res.json();
+                const processes = data.data || [];
+
+                if (processes.length === 0) {
+                    tbody.innerHTML = `
+                        <tr><td colspan="5">
+                            <div class="empty-state" style="padding:40px;margin:0;">
+                                <div class="empty-state-icon">📋</div>
+                                <h3>אין תהליכים</h3>
+                                <p>תהליכי הפקה יופיעו כאן לאחר הפעלת "הפק תיקי אכלוס"</p>
+                            </div>
+                        </td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = processes.map(p => {
+                    const startDt  = new Date(p.startedAt);
+                    const startStr = startDt.toLocaleDateString('he-IL') + ' ' +
+                                     startDt.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+                    const endStr   = p.completedAt
+                        ? (() => {
+                            const d = new Date(p.completedAt);
+                            return d.toLocaleDateString('he-IL') + ' ' +
+                                   d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+                          })()
+                        : '—';
+                    const statusClass = p.status === 'COMPLETED' ? 'restoration-completed' : 'waiting';
+                    const statusLabel = p.status === 'COMPLETED' ? 'הושלם' : 'בעיבוד';
+                    return `
+                        <tr>
+                            <td>${p.settlementName}</td>
+                            <td>${p.startedBy}</td>
+                            <td>${startStr}</td>
+                            <td>${endStr}</td>
+                            <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                        </tr>`;
+                }).join('');
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--error-red);padding:20px;">שגיאה בטעינת תהליכים. אנא נסה שנית.</td></tr>`;
+            }
+        }
+
+        loadReportsList();
+    </script>
+</body>
+</html>

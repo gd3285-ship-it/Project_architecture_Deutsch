@@ -1,0 +1,18 @@
+{
+  "name": "damage-reports-system",
+  "version": "1.0.0",
+  "description": "Damage Report Management System - MVP",
+  "type": "module",
+  "scripts": {
+    "dev": "node backend/start-all.js",
+    "start": "node backend/start-all.js",
+    "dev:api": "node backend/server.js",
+    "dev:return-home": "node backend/return-home-package-server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "pdfkit": "^0.19.1",
+    "uuid": "^9.0.0"
+  }
+}

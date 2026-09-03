@@ -1,0 +1,49 @@
+messageId,buildingId,email,subject,dateTime,status
+0e795e62-58e9-4621-bb15-62190cbc6919,test-1,"test@test.com","test subject",2026-07-08T17:43:57.948Z,SENT
+3ab13a23-17e2-4e2f-a71b-7e764f2e01e9,e93f9c26-ff62-462e-a94d-9ab54102ec28,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T17:46:57.396Z,SENT
+bea05d96-d662-4ed9-a174-89bd19c1068c,e93f9c26-ff62-462e-a94d-9ab54102ec28,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T17:56:38.829Z,SENT
+2956e75b-b11e-46d1-87a4-a7e73de46d9c,5b4a6758-80d0-4b4d-a23f-bc90f31f4ebf,"david.cohen@jerusalem.gov.il","אישור חזרה לבית רחוב יפו 12, ירושלים",2026-07-08T17:57:25.646Z,SENT
+e1326728-40b6-4f31-af90-ec22d72218dd,b1,"t@t.com","test",2026-07-08T18:10:31.096Z,FAILED
+4882b3a0-8d60-4652-bc44-643a741b31d8,b1,"t@t.com","test",2026-07-08T18:10:31.203Z,FAILED
+df9491a3-f949-47ab-b475-894488d2c798,b1,"t@t.com","test",2026-07-08T18:10:31.241Z,SENT
+49b880c9-1b1f-4ee9-8bf5-7d7247b9d775,b1,"t@t.com","test",2026-07-08T18:10:31.326Z,SENT
+ffa76254-326d-40d4-a483-8ae35fea2bf6,635e2e10-31aa-4a6c-9805-5feeff2485b6,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:29:53.580Z,FAILED
+7d5cb0d3-b205-4f31-9ce9-d56212349cb3,635e2e10-31aa-4a6c-9805-5feeff2485b6,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:29:53.595Z,SENT
+dc4caeeb-1c81-4981-9615-55cc39956cd3,635e2e10-31aa-4a6c-9805-5feeff2485b6,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:29:54.891Z,FAILED
+6e002ce9-3082-4341-919e-a9bff36e6f0a,635e2e10-31aa-4a6c-9805-5feeff2485b6,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:29:54.902Z,FAILED
+c8d3a8cb-1a59-4e37-8856-4a47658f7ac7,635e2e10-31aa-4a6c-9805-5feeff2485b6,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:29:54.911Z,FAILED
+e48149d3-e926-463d-8252-f251ef9f8cf5,ca798e2c-9143-49be-a4c1-ced839d5ba0c,"leah.weiss@gmail.com","אישור חזרה לבית רחוב ממילא 5, ירושלים",2026-07-08T18:30:18.066Z,FAILED
+8b728ed6-a7ee-4562-a9b8-e5e7a090d0e1,ca798e2c-9143-49be-a4c1-ced839d5ba0c,"leah.weiss@gmail.com","אישור חזרה לבית רחוב ממילא 5, ירושלים",2026-07-08T18:30:18.083Z,FAILED
+1523f0ff-5bad-4457-bd41-16a821d4c74d,ca798e2c-9143-49be-a4c1-ced839d5ba0c,"leah.weiss@gmail.com","אישור חזרה לבית רחוב ממילא 5, ירושלים",2026-07-08T18:30:18.096Z,FAILED
+debe25e3-6a7f-4d0f-a7de-2572fee0e895,206f8118-c07b-446a-89e4-3037f3f32d75,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:47:46.875Z,SENT
+91649149-9d79-4ef8-9e84-2bc3fb7b43ae,test,"t@t.com","s",2026-07-08T18:48:03.498Z,SENT
+72a22e39-8160-4092-a38e-ecc07f83a60b,206f8118-c07b-446a-89e4-3037f3f32d75,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:48:21.355Z,SENT
+e43ba426-75be-45fd-a32a-7640834e9cfb,bd10162b-0b8c-452e-96fb-116f1744b1d4,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:49:27.663Z,SENT
+e352ee57-ffc0-4c13-8d07-87061b94b722,bd10162b-0b8c-452e-96fb-116f1744b1d4,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:49:27.677Z,SENT
+aae6c71d-4f66-4274-8941-34e173bf7bb0,bd10162b-0b8c-452e-96fb-116f1744b1d4,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:49:27.689Z,SENT
+6578e4d6-257a-4d92-9fe5-ca4cbd6edc57,bd10162b-0b8c-452e-96fb-116f1744b1d4,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:50:03.281Z,SENT
+0ef27399-00eb-4e55-a160-28a82f7aeadb,bd10162b-0b8c-452e-96fb-116f1744b1d4,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:50:03.298Z,SENT
+8375ec20-3c5d-4a9a-b5a2-d1719256bb25,bd10162b-0b8c-452e-96fb-116f1744b1d4,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T18:50:03.311Z,SENT
+c16b934d-e1ca-458d-abb1-e83d353a165d,9468ead1-76d2-44b8-ae42-ed94573cca38,"david.cohen@jerusalem.gov.il","אישור חזרה לבית רחוב יפו 12, ירושלים",2026-07-08T18:50:20.848Z,SENT
+e98b775a-2cc8-485a-b743-4f08e6876cdc,9468ead1-76d2-44b8-ae42-ed94573cca38,"david.cohen@jerusalem.gov.il","אישור חזרה לבית רחוב יפו 12, ירושלים",2026-07-08T18:50:20.866Z,SENT
+6c521894-f6ef-498b-85b7-62f79650a384,9468ead1-76d2-44b8-ae42-ed94573cca38,"david.cohen@jerusalem.gov.il","אישור חזרה לבית רחוב יפו 12, ירושלים",2026-07-08T18:50:20.885Z,SENT
+6a79eb0a-d990-4569-b8fc-eb555cc96935,906efba0-f71b-4f47-aeea-885892ecd1be,"rachel.levi@gmail.com","אישור חזרה לבית רחוב בן יהודה 45, ירושלים",2026-07-08T18:57:41.394Z,SENT
+f2f3625a-f488-4983-a468-cc530433f41f,d6573e2e-9961-4865-95b9-d3c14536cea0,"sarah.goldberg@hotmail.com","אישור חזרה לבית שדרות רוטשילד 3, ירושלים",2026-07-08T18:57:59.066Z,SENT
+5895a509-e1aa-4699-abd6-dfbc0801bf0c,d6573e2e-9961-4865-95b9-d3c14536cea0,"sarah.goldberg@hotmail.com","אישור חזרה לבית שדרות רוטשילד 3, ירושלים",2026-07-08T18:57:59.077Z,SENT
+bf9cd1e7-508e-45ea-9652-c8f82c675843,d6573e2e-9961-4865-95b9-d3c14536cea0,"sarah.goldberg@hotmail.com","אישור חזרה לבית שדרות רוטשילד 3, ירושלים",2026-07-08T18:57:59.091Z,SENT
+54b57872-6a5d-4732-b812-0b692f8c5d16,37fbb875-1c25-400c-994a-57d2ce962f5d,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T19:11:29.004Z,SENT
+2c12c7ef-d62c-4748-9219-163eeff2bd0a,37fbb875-1c25-400c-994a-57d2ce962f5d,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T19:12:17.512Z,SENT
+53db05a6-3ab0-4ddb-b2b1-13d43e912522,37fbb875-1c25-400c-994a-57d2ce962f5d,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-08T19:12:54.958Z,SENT
+2d296719-029b-4ead-93ad-e0efda9d27c6,64e9416d-800d-4f7b-87b6-bec14ca5369c,"david.cohen@jerusalem.gov.il","אישור חזרה לבית רחוב יפו 12, ירושלים",2026-07-08T19:13:51.651Z,SENT
+22898472-3650-4b34-99ee-9d15c16058cb,977e8e8f-8c3b-4854-bc8f-33a2397a2684,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-12T19:39:28.139Z,SENT
+fb28cd8f-1d20-4e55-a8a5-9b38af5523e6,347c664e-351c-4e60-8670-144b5fc1de30,"david.cohen@jerusalem.gov.il","אישור חזרה לבית רחוב יפו 12, ירושלים",2026-07-12T19:39:29.303Z,SENT
+c9eea708-fca9-4e5b-b99c-cf9f682d9b0b,6988c31d-9186-4b5a-890b-309c6f407a72,"rachel.levi@gmail.com","אישור חזרה לבית רחוב בן יהודה 45, ירושלים",2026-07-12T19:39:30.441Z,SENT
+6a364771-f614-491a-ba54-a86fdf7498e9,b0f30814-6ee7-4de8-a8df-3b4546f2306f,"moshe.avraham@walla.co.il","אישור חזרה לבית רחוב המלך ג'ורג' 7, ירושלים",2026-07-12T19:39:31.597Z,SENT
+e4054641-c950-4b48-8e5d-8ae3717a1fd9,6365397e-3803-4e6f-8441-5b08f139a318,"sarah.goldberg@hotmail.com","אישור חזרה לבית שדרות רוטשילד 3, ירושלים",2026-07-12T19:39:32.777Z,SENT
+9b0e2263-8e7f-4cfd-9743-bbb35285cc0a,aac0c8d6-6fef-43b6-aac6-6c741748a49e,"yosef.friedman@gmail.com","אישור חזרה לבית רחוב אגריפס 22, ירושלים",2026-07-12T19:39:33.899Z,SENT
+9572c058-8dac-4c48-9abb-0e011e9bc18f,df60060b-060f-4ff8-bfe2-293241e64862,"miriam.shapira@yahoo.com","אישור חזרה לבית רחוב הנביאים 60, ירושלים",2026-07-12T19:39:35.028Z,SENT
+65972dd5-4665-406c-b11a-ddd0217db141,a60e2bd2-bdab-4914-b6f9-657d636374cb,"avraham.berkowitz@bezeq.net.il","אישור חזרה לבית רחוב שמאי 14, ירושלים",2026-07-12T19:39:36.165Z,SENT
+221bedc5-2b93-4582-a5ef-e1dffc3272ea,931c95fe-b7a2-42d0-b396-b10fd951883f,"leah.weiss@gmail.com","אישור חזרה לבית רחוב ממילא 5, ירושלים",2026-07-12T19:39:37.308Z,SENT
+5dd5cafd-fe88-4744-88dc-c18b62b1a116,ca6bb750-e515-422a-a2b0-9f124cf68eed,"nachum.katz@walla.co.il","אישור חזרה לבית רחוב קינג דייוויד 9, ירושלים",2026-07-12T19:39:38.474Z,SENT
+d3b243f6-6ebb-4495-bb34-9b2720806176,4e2c12b5-5cc5-44e5-b204-d1826ea805a2,"hana.rosenberg@hotmail.com","אישור חזרה לבית רחוב הלל 31, ירושלים",2026-07-12T19:39:39.620Z,SENT
+d39e567c-1105-4279-81e2-4b9c3800f800,977e8e8f-8c3b-4854-bc8f-33a2397a2684,"john.smith@example.com","אישור חזרה לבית 123 Main St, Apt 4B",2026-07-12T21:48:32.237Z,SENT
